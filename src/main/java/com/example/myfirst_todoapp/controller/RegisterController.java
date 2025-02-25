@@ -3,6 +3,8 @@ package com.example.myfirst_todoapp.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -25,8 +27,13 @@ public class RegisterController {
     }
 
     @PostMapping("/register")
-    public String register(Model model, RegisterForm registerForm, HttpSession session) {
+    public String register(Model model, @Validated RegisterForm registerForm, HttpSession session,
+            BindingResult result) {
 
+        if (result.hasErrors()) {
+            model.addAttribute("registerForm", registerForm);
+            return "register";
+        }
         // ユーザー名の重複チェック
         if (registerService.checkUserName(registerForm.getUserName())) {
             model.addAttribute("registerForm", registerForm);
