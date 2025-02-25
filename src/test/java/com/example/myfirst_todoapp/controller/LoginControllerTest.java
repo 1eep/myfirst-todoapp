@@ -77,7 +77,7 @@ public class LoginControllerTest {
 
     // ログイン失敗（パスワードが空文字）
     @Test
-    void loginFailure004() throws Exception {
+    void loginFailure002() throws Exception {
         when(loginService.findByUserName("testUser")).thenReturn(testUserEntity);
 
         mockMvc.perform(post("/login")
@@ -91,7 +91,7 @@ public class LoginControllerTest {
 
     // ログイン失敗（パスワード違い）
     @Test
-    void loginFailure002() throws Exception {
+    void loginFailure003() throws Exception {
         when(loginService.findByUserName("testUser")).thenReturn(testUserEntity);
 
         mockMvc.perform(post("/login")
@@ -108,7 +108,7 @@ public class LoginControllerTest {
 
     // ログイン失敗（ユーザが存在しない）
     @Test
-    void loginFailure003() throws Exception {
+    void loginFailure004() throws Exception {
         when(loginService.findByUserName("unknownUser")).thenReturn(null);
 
         mockMvc.perform(post("/login")
