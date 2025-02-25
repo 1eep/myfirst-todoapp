@@ -36,6 +36,7 @@ public class LoginControllerTest {
     @BeforeEach
     void setUp() {
         testUserEntity = new UserEntity();
+        testUserEntity.setUserId(1);
         testUserEntity.setUserName("testUser");
         testUserEntity.setUserPassword("testPassword");
     }
@@ -73,4 +74,53 @@ public class LoginControllerTest {
                 .andExpect(redirectedUrl("/login"));
         verify(loginService, never()).findByUserName(any());
     }
+
+    // ログイン失敗（パスワードが空文字）
+    @Test
+    void loginFailure004() throws Exception {
+        when(loginService.findByUserName("testUser")).thenReturn(testUserEntity);
+
+        mockMvc.perform(post("/login")
+                .param("userName", "testUser")
+                .param("userPassword", ""))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/login"));
+
+        verify(loginService, never()).findByUserName(any());
+    }
+
+    // ログイン失敗（パスワード違い）
+    @Test
+    void loginFailure002() throws Exception {
+        when(loginService.findByUserName("testUser")).thenReturn(testUserEntity);
+
+        mockMvc.perform(post("/login")
+                .param("userName", "testUser")
+                .param("userPassword", "wrongPassword"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("login"))
+                .andExpect(model().attributeExists("loginForm"))
+                .andExpect(model().attributeExists("errorMessage"))
+                .andExpect(model().attribute("errorMessage", "⚠︎ ユーザー名またはパスワードに誤りがあります。"));
+
+        verify(loginService, times(1)).findByUserName("testUser");
+    }
+
+    // ログイン失敗（ユーザが存在しない）
+    @Test
+    void loginFailure003() throws Exception {
+        when(loginService.findByUserName("unknownUser")).thenReturn(null);
+
+        mockMvc.perform(post("/login")
+                .param("userName", "unknownUser")
+                .param("userPassword", "password"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("login"))
+                .andExpect(model().attributeExists("loginForm"))
+                .andExpect(model().attributeExists("errorMessage"))
+                .andExpect(model().attribute("errorMessage", "⚠︎ ユーザー名またはパスワードに誤りがあります。"));
+
+        verify(loginService, times(1)).findByUserName("unknownUser");
+    }
+
 }
