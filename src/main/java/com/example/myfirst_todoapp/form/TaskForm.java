@@ -19,7 +19,6 @@ public class TaskForm {
     @NotBlank
     private String taskDescription;
 
-    @NotBlank
     private Date taskDeadline;
 
     @NotBlank
